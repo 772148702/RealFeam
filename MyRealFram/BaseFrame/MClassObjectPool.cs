@@ -1,5 +1,5 @@
-uisng UnityEngine;
-
+using  UnityEngine;
+using System.Collections.Generic;
 
 class MClassObjectPool<T> where T: class, new()
 {
@@ -17,17 +17,19 @@ class MClassObjectPool<T> where T: class, new()
           if(tempT==null)
           {
       
-             return T tempT = new T();
+             return tempT = new T();
           } else 
           {
               return tempT;
           }
-        } else 
+        }
+        else 
         {
             if(spanwIfPoolEmpty)
             {
                 needRecycleCount++;
-                return T tempT = new T();
+                T tempT;
+                return tempT = new T();
             } else {
                 return null;
             }
