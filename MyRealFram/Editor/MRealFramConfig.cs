@@ -48,9 +48,9 @@ public class MRealFramConfigInspector:Editor
 
 public class MRealConfig
 {
-    private const string MRealFramPath = "Assets/MRealFram/Editor/MRealFramConfig.asset";
+    private const string MRealFramPath = "Assets/MyRealFram/Editor/ABConfig.asset";
 
-    public static MRealFramConfig GetRealFram()
+    public static MRealFramConfig  GetRealFram()
     {
         MRealFramConfig realConfig = AssetDatabase.LoadAssetAtPath<MRealFramConfig>(MRealFramPath);
         return realConfig;

@@ -17,3 +17,7 @@ MonoBehaviour:
   m_AllFileDirAB:
   - ABName: ugui
     Path: Assets/GameData/UGUI
+  - ABName: shader
+    Path: Assets/GameData/Shaders
+  - ABName: moble
+    Path: Assets/GameData/Modle
