@@ -4,24 +4,32 @@ using System.IO;
 using UnityEngine;
 using System.Xml.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
+using MyRealFram;
+
 
 public class ResourceTest : MonoBehaviour
 {
     // Use this for initialization
     void Start()
     {
-        //AssetBundle assetBundle = AssetBundle.LoadFromFile(Application.streamingAssetsPath + "/attack");
-        //GameObject obj = GameObject.Instantiate(assetBundle.LoadAsset<GameObject>("attack"));
-        //GameObject obj = GameObject.Instantiate(UnityEditor.AssetDatabase.LoadAssetAtPath<GameObject>("Assets/GameData/Prefabs/Attack.prefab"));
-        //BinaryDeSerTest();
-        //ReadTestAssets();
+        // AssetBundle assetBundle = AssetBundle.LoadFromFile(Application.streamingAssetsPath + "/attack");
+        // GameObject obj = GameObject.Instantiate(assetBundle.LoadAsset<GameObject>("attack"));
+        // GameObject obj = GameObject.Instantiate(UnityEditor.AssetDatabase.LoadAssetAtPath<GameObject>("Assets/GameData/Prefabs/Attack.prefab"));
+        // BinaryDeSerTest();
+        // ReadTestAssets();
         TestLoadAB();
     }
 
     void TestLoadAB()
     {
-        //AssetBundle configAB = AssetBundle.LoadFromFile (Application.streamingAssetsPath + "/assetbundleconfig");
-        //TextAsset textAsset = configAB.LoadAsset<TextAsset>("AssetBundleConfig");
+        MyRealFram.AssetBundleManager.Instance.LoadAssetBundleConfig();
+        // AssetBundle configAB = AssetBundle.LoadFromFile (Path.Combine(Application.streamingAssetsPath , "assetbundleconfig"));
+        // TextAsset textAsset = configAB.LoadAsset<TextAsset>("AssetBundleConfig");
+        // if (textAsset == null)
+        // {
+        //     Debug.LogError("AssetBundleConfig is not exist");
+        //     return false;
+        // }
         //MemoryStream stream = new MemoryStream(textAsset.bytes);
         //BinaryFormatter bf = new BinaryFormatter();
         //AssetBundleConfig testSerilize = (AssetBundleConfig)bf.Deserialize(stream);

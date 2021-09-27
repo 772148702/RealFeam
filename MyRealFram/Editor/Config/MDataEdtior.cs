@@ -2,10 +2,6 @@
 using UnityEditor;
 using UnityEngine;
 
-
-
-
-
 public class MDataEdtior
 {
     public static string abPath = MRealConfig.GetRealFram().abPath;
