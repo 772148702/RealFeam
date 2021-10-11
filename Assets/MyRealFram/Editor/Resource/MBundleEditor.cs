@@ -104,7 +104,7 @@
                 AssetDatabase.Refresh();
                 EditorUtility.ClearProgressBar();
             }
-
+            //根据刚刚设置的ab名字得到相应的路径，由此生成相应的item
             static void BuildAssetBundle()
             {
                 //设置了名字后会返回，也就是说只有在MABCongfigure中的文件才会被记录，被AB命名
@@ -156,7 +156,7 @@
                 return false;
             }
             
-            
+            //生成对于item选项 Disctionary<path,ABName>
             static void WriteData(Dictionary<string,string> resPathDic)
             {
                 MyRealFram.AssetBundleConfig config = new MyRealFram.AssetBundleConfig();
@@ -172,6 +172,7 @@
                     abBase.AssetName = path.Remove(0, path.LastIndexOf("/") + 1);
                     abBase.ABDependence = new List<string>();
                     string[] resDependce = AssetDatabase.GetDependencies(path);
+                    //得到依赖文件的的ABm名字，将其加入到依赖中
                     for (int i = 0; i < resDependce.Length; i++)
                     {
                         string tempPath = resDependce[i];
