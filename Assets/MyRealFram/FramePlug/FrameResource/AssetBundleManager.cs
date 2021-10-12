@@ -29,7 +29,7 @@ namespace MyRealFram
         public bool LoadAssetBundleConfig()
         {
 #if UNITY_EDITOR
-            if (!ResourceManager.Instance.m_LoadFormAssetBundle)
+            if (!ResourceManager.Instance.m_LoadFromAssetBundle)
             {
                 return false;
             }
@@ -83,6 +83,7 @@ namespace MyRealFram
                 return item;
             }
 
+            item.m_AssetBundle = LoadAssetBundle(item.m_ABName);
             if (item.m_DependAssetBundle != null)
             {
                 for (int i = 0; i < item.m_DependAssetBundle.Count; i++)
@@ -94,6 +95,7 @@ namespace MyRealFram
             return item;
         }
         
+        //通过AB包名字的crc的来存储缓存
         private AssetBundle LoadAssetBundle(string name)
         {
             AssetBundleItem item = null;
@@ -152,6 +154,7 @@ namespace MyRealFram
             }
         }
 
+        //查找已经缓存的Item，没有就创建
         public ResourceItem FindResourceItme(uint crc)
         {
             ResourceItem item = null;
@@ -172,6 +175,7 @@ namespace MyRealFram
         }
     }
    
+    //当个资源
     public class ResourceItem
     {
         public uint m_Crc = 0;
