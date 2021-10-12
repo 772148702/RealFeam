@@ -6,7 +6,7 @@ namespace QFrameWork
     public class ResolutionCheck
     {
         #if UNITY_EDITOR
-                [MenuItem("QFrameWork/9.屏幕宽高比判断")]
+                [MenuItem("QFrameWork/9.屏幕宽高比判断",false ,5)]
                 private static void MenuAspectJudge()
                 {
                     Debug.Log(IsPadScreen()?"是Pad分辨率":"不是Pad分辨率");

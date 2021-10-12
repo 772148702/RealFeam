@@ -15,7 +15,7 @@ namespace QFrameWork
     public class PreviousClass
     {
 #if UNITY_EDITOR
-        [MenuItem("QFrameWork/12.概率函数")]
+        [MenuItem("QFrameWork/12.概率函数",false,10)]
 #endif
         private static void MenuPercent()
         {
