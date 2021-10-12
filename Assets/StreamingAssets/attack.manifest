@@ -1,0 +1,37 @@
+ManifestFileVersion: 0
+CRC: 3194756724
+Hashes:
+  AssetFileHash:
+    serializedVersion: 2
+    Hash: cac97562c8d3d8d5bc6ab2110e03463c
+  TypeTreeHash:
+    serializedVersion: 2
+    Hash: db9f5af579b13dd8d42f534b95248f00
+HashAppended: 0
+ClassTypes:
+- Class: 1
+  Script: {instanceID: 0}
+- Class: 4
+  Script: {instanceID: 0}
+- Class: 21
+  Script: {instanceID: 0}
+- Class: 23
+  Script: {instanceID: 0}
+- Class: 33
+  Script: {instanceID: 0}
+- Class: 43
+  Script: {instanceID: 0}
+- Class: 90
+  Script: {instanceID: 0}
+- Class: 95
+  Script: {instanceID: 0}
+- Class: 114
+  Script: {fileID: 11500000, guid: 066b4fdf2c430cf47b5cab25f17b77ab, type: 3}
+- Class: 115
+  Script: {instanceID: 0}
+- Class: 137
+  Script: {instanceID: 0}
+Assets:
+- Assets/GameData/Prefabs/Attack.prefab
+Dependencies:
+- D:/UnityProject/siki/unity resource load siki/RealFram/RealFram/Assets/../AssetBundleStandaloneWindows64/moble
