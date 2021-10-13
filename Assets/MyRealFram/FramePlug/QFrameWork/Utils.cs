@@ -13,7 +13,11 @@ namespace QFrameWork
         {
             GUIUtility.systemCopyBuffer = text;
         }
-        
+
+        public static void PrintLog(string content)
+        {
+            UnityEngine.Debug.Log(content);
+        }
           
     }
     public class ExportUtil
