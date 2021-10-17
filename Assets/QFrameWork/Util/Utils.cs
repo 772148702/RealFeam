@@ -1,6 +1,4 @@
-﻿
-
-using System;
+﻿using System;
 using System.IO;
 using UnityEditor;
 using UnityEngine;
@@ -46,7 +44,9 @@ namespace QFrameWork
 
         public static void CallMenuItem(string menuItem)
         {
+            #if UNITY_EDITOR
             UnityEditor.EditorApplication.ExecuteMenuItem(menuItem);
+            #endif
         }
         
 

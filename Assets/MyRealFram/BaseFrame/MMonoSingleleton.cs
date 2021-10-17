@@ -23,9 +23,8 @@ class MMonoSingleleton<T> : MonoBehaviour where T: MMonoSingleleton<T>
                 instance = (T)this;
             } else
             {
-            UnityEngine.Debug.Log("Singleleton error");
+                UnityEngine.Debug.Log("Singleleton error");
             }
-        
         }
 }
 

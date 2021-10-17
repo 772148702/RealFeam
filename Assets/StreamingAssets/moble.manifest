@@ -1,9 +1,9 @@
 ManifestFileVersion: 0
-CRC: 1439862605
+CRC: 899188657
 Hashes:
   AssetFileHash:
     serializedVersion: 2
-    Hash: 47226d4c92c097358848a6c21fdafb34
+    Hash: 4db6da5f00190ae00ab9a5efbc085240
   TypeTreeHash:
     serializedVersion: 2
     Hash: b56590ed759c0a42ff1262ca0255071a
@@ -56,4 +56,4 @@ Assets:
 - Assets/GameData/Modle/benghuai/Avatar_Kiana_C2_Texture_Body_Color_RGB2048.png
 - Assets/GameData/Modle/benghuai/ID_362.bmp
 Dependencies:
-- D:/UnityProject/siki/unity resource load siki/RealFram/RealFram/Assets/../AssetBundleStandaloneWindows64/shader
+- D:/UnityProject/siki/unity resource load siki/RealFram/RealFram/Assets/../AssetBundle/StandaloneWindows64/shader

@@ -3,7 +3,7 @@ CRC: 3194756724
 Hashes:
   AssetFileHash:
     serializedVersion: 2
-    Hash: cac97562c8d3d8d5bc6ab2110e03463c
+    Hash: 788128e2344a39b8fac63053ee4a8eb5
   TypeTreeHash:
     serializedVersion: 2
     Hash: db9f5af579b13dd8d42f534b95248f00
@@ -34,4 +34,4 @@ ClassTypes:
 Assets:
 - Assets/GameData/Prefabs/Attack.prefab
 Dependencies:
-- D:/UnityProject/siki/unity resource load siki/RealFram/RealFram/Assets/../AssetBundleStandaloneWindows64/moble
+- D:/UnityProject/siki/unity resource load siki/RealFram/RealFram/Assets/../AssetBundle/StandaloneWindows64/moble

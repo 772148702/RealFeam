@@ -9,11 +9,11 @@
     using UnityEngine;
     using FileMode = System.IO.FileMode;
 
-    namespace MyRealFram.Editor.Resource
+    namespace MyRealFram
     {
-        public class MBundleEditor
+        public class BundleEditor
         {
-            private static string m_BundleTargetPath = Application.dataPath+"/../AssetBundle"+ EditorUserBuildSettings.activeBuildTarget.ToString();
+            private static string m_BundleTargetPath = Application.dataPath+"/../AssetBundle/"+ EditorUserBuildSettings.activeBuildTarget.ToString();
             private static string ABCONFIGPATH = "Assets/MyRealFram/Editor/Resource/MABConfig.asset";
             private static string ABBYTEPATH = MRealConfig.GetRealFram().abPath;
             //key是ab包名,value是路径，所有文件夹ab包dic
@@ -25,7 +25,7 @@
             //储存所有的有效路径
             private static List<string> m_ConfigFil = new List<string>();
 
-            [MenuItem("MTools/打包")]
+         
             public static void Build()
             {
                 EditorUtility.ClearProgressBar();
@@ -118,7 +118,7 @@
                     {
                         if(allBundlePath[j].EndsWith(".cs")) continue;
                         
-                        Debug.Log("此AB包:"+allBundles[i]+"下面包含资源文件路径:"+allBundlePath[j]);
+                        Debug.Log("AB包:"+allBundles[i]+" 包含资源文件路径:"+allBundlePath[j]);
                         resDic.Add(allBundlePath[j],allBundles[i]);
                     }
                 }
@@ -192,7 +192,7 @@
                     config.AbBases.Add(abBase);
                 }
 
-                string xmlPath = Application.dataPath + "/AssetBundleConfig.xml";
+                string xmlPath = m_BundleTargetPath+ "/AssetBundleConfig.xml";
                 if(File.Exists(xmlPath)) File.Delete(xmlPath);
 
                 FileStream fileStream =

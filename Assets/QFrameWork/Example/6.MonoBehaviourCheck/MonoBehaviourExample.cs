@@ -22,7 +22,9 @@ namespace QFrameWork
         {
             Delay(1.0f,()=>
             {
+#if UNITY_EDITOR
                 UnityEditor.EditorApplication.isPlaying = false;
+#endif
             });
         }
 
@@ -46,7 +48,9 @@ namespace QFrameWork
                 UnRegister("msg2",MsgFun1);
                 MsgDispatcher.SendMessage("msg2","Msg2");
                 Destroy(this.gameObject);
+                #if UNITY_EDITOR
                 UnityEditor.EditorApplication.isPlaying = false;
+                #endif
             });
         }
 

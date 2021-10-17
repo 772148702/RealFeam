@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using UnityEditor.Build.Reporting;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
@@ -30,13 +29,13 @@ namespace MyRealFram
         public long m_Guid = 0;
 
         public bool m_Already = false;
-
+        //是否放到场景节点下面
         public bool m_SetSceneParent = false;
-
-        public OnAsyncFinsih m_DealFinish = null;
-
+        //实例化资源加载完成回调
+        public OnAsyncObjFinish m_DealFinish = null;
+        //异步参数
         public object m_Param1, m_Param2, m_Param3 = null;
-
+        //离线数据
         public OfflineData m_OfflineData = null;
         
         public void Reset()
@@ -96,6 +95,8 @@ namespace MyRealFram
     public delegate void OnAsyncObjFinish(string path, Object obj, object param1 = null, object param2 = null,
         object param3 = null);
     
+    
+    
     //实例化对象完成回调
     public delegate void OnAsyncFinsih(string path, ResourceObj resouceObj, object param1 = null, object param2 = null,
         object param3 = null);
@@ -118,7 +119,7 @@ namespace MyRealFram
         protected  List<AsyncLoadResParam> [] m_LoadingAssetList = new List<AsyncLoadResParam>[(int) LoadResPriority.RES_NUM];
         //正在异步加载的Dic
         protected  Dictionary<uint,AsyncLoadResParam> m_LoadingAssetDic = new Dictionary<uint, AsyncLoadResParam>();
-        
+        //最长连续加载资源的时间，单位微秒
         private const long MAX_LOAD_RES_TIME = 20000;
         private const int MAX_CACHE_COUNT = 500;
 
@@ -187,6 +188,7 @@ namespace MyRealFram
                     Object obj = null;
                     ResourceItem item = null;
 #if UNITY_EDITOR
+                    //如果在编辑器里吗开启非AB模式，则通过LoadAssetByEditor加载资源
                     if (!m_LoadFromAssetBundle)
                     {
                         if (loadingItem.m_Sprite)
@@ -198,7 +200,7 @@ namespace MyRealFram
                             obj = LoadAssetByEditor<Object>(loadingItem.m_Path);
                         }
                         yield return new WaitForSeconds(0.5f);
-
+                        //查找已经缓存的Item，没有就创建
                         item = AssetBundleManager.Instance.FindResourceItme(loadingItem.m_Crc);
                         if (item == null)
                         {
@@ -209,6 +211,7 @@ namespace MyRealFram
 #endif
                     if (obj == null)
                     {
+                        //通过crc来加载ab，如果已经缓存了的就直接加载，否则就加载AB与其依赖
                         item = AssetBundleManager.Instance.LoadResourceAssetBundle(loadingItem.m_Crc);
                         if (item != null && item.m_AssetBundle != null)
                         {
@@ -241,15 +244,49 @@ namespace MyRealFram
                             tempResourceObj.m_ResItem = item;
                             callBack.m_DealFinish(loadingItem.m_Path, tempResourceObj, tempResourceObj.m_Param1,
                                 tempResourceObj.m_Param2, tempResourceObj.m_Param3);
+                            callBack.m_DealFinish = null;
+                            tempResourceObj = null;
                         }
+
+                        if (callBack != null && callBack.m_DealObjFinish != null)
+                        {
+                            callBack.m_DealObjFinish(loadingItem.m_Path, obj, callBack.m_Param1, callBack.m_Param2,
+                                callBack.m_Param3);
+                            callBack.m_DealObjFinish = null;
+                        }
+                        callBack.Reset();
+                        m_AsyncCallBackPool.Recycle(callBack);
+                    }
+                    if (System.DateTime.Now.Ticks - lastYieldTime > MAX_LOAD_RES_TIME)
+                    {
+                        yield return null;
+                        lastYieldTime = System.DateTime.Now.Ticks;
+                        haveYield = true;
                     }
                 }
-                
-                
+                if (!haveYield || System.DateTime.Now.Ticks - lastYieldTime > MAX_LOAD_RES_TIME)
+                {
+                    lastYieldTime = System.DateTime.Now.Ticks;
+                    yield return null;
+                }
             }
         }
         
+        public int DecreaseResourceRef(ResourceObj resObj, int count = 1)
+        {
+            return resObj != null ? DecreaseResourceRef(resObj.m_Crc, count) : 0;
+        }
+        
+        public int DecreaseResourceRef(uint crc, int count = 1)
+        {
+            ResourceItem item = null;
+            if (!AssetDic.TryGetValue(crc, out item) || item == null)
+                return 0;
 
+            item.RefCount -= count;
+
+            return item.RefCount;
+        }
         public bool CancelLoad(ResourceObj res)
         {
             AsyncLoadResParam para = null;
@@ -312,6 +349,7 @@ namespace MyRealFram
             return item;
         }
         
+        //预加载资源（同步加载)
         public void PreLoadRes(string path)
         {
             if (string.IsNullOrEmpty(path))
@@ -383,6 +421,7 @@ namespace MyRealFram
                 if (res.m_Guid == obj.GetInstanceID())
                 {
                     item = res;
+                    break;
                 }
             }
 
@@ -414,6 +453,18 @@ namespace MyRealFram
             return true;
         }
 
+        public ResourceItem GetResourceItem(string path)
+        {
+            uint crc = Crc32.GetCrc32(path);
+            ResourceItem item = GetCacheResourceItem(crc);
+            if (item == null)
+            {
+                Debug.Log("the resource does not loaded");
+            }
+
+            return item;
+        }
+        //同步加载，会阻塞
         public T LoadResource<T>(string path) where T : UnityEngine.Object
         {
             if (String.IsNullOrEmpty(path))
@@ -590,6 +641,7 @@ namespace MyRealFram
             if (!destoryCache)
             {
                 m_NoRefrenceAssetMapList.InsertToHead(item);
+                return;
             }
 
             if (!AssetDic.Remove(item.m_Crc))
@@ -600,7 +652,7 @@ namespace MyRealFram
             //释放assetbundle引用
             AssetBundleManager.Instance.ReleaseAsset(item);
             //清空资源对应的对象池
-            ObjectManager.Instance.ClearPoolObject(item.m_Crc);
+            global::ObjectManager.Instance.ClearPoolObject(item.m_Crc);
 
             if (item.m_Obj != null)
             {
@@ -649,14 +701,44 @@ namespace MyRealFram
                 m_LoadingAssetList[(int) priority].Add(para);
             }
             
-            
-
+            //往回调列表里面加回调
+            AsyncCallBack callBack = m_AsyncCallBackPool.Spawn(true);
+            callBack.m_DealObjFinish = dealFinish;
+            callBack.m_Param1 = param1;
+            callBack.m_Param2 = param2;
+            callBack.m_Param3 = param3;
+            para.m_CallBackList.Add(callBack);
         }
-        
-        
+
+        public void AsyncLoadResource(string path, ResourceObj resObj, OnAsyncFinsih dealfinish,
+            LoadResPriority priority)
+        {
+            ResourceItem item = GetCacheResourceItem(resObj.m_Crc);
+            if (item != null)
+            {
+                resObj.m_ResItem = item;
+                if (dealfinish != null)
+                {
+                    dealfinish(path, resObj);
+                }
+                return;
+            }
+
+            AsyncLoadResParam para = null;
+            if (!m_LoadingAssetDic.TryGetValue(resObj.m_Crc, out para) || para == null)
+            {
+                para = m_AsyncLoadResParamPool.Spawn(true);
+                para.m_Crc = resObj.m_Crc;
+                para.m_Path = path;
+                para.m_Priority = priority;
+                m_LoadingAssetDic.Add(resObj.m_Crc,para);
+                m_LoadingAssetList[(int)priority].Add(para);
+            }
+
+            AsyncCallBack callback = m_AsyncCallBackPool.Spawn(true);
+            callback.m_DealFinish = dealfinish;
+            callback.m_ResObj = resObj;
+            para.m_CallBackList.Add(callback);
+        }
     }
-    
-    
-    
-    
 }

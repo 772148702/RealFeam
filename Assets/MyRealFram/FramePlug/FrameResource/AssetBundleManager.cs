@@ -18,9 +18,8 @@ namespace MyRealFram
 
         //AssetBundleItme对象池
         protected ClassObjectPool<AssetBundleItem> m_AssetBundleItemPool =
-            ObjectManager.Instance.GetOrCreatClassPool<AssetBundleItem>(500);
-
-
+          ObjectManager.Instance.GetOrCreateClassPool<AssetBundleItem>(500);
+        
         protected string ABLoadPath
         {
             get { return Application.streamingAssetsPath + "/"; }
@@ -69,6 +68,7 @@ namespace MyRealFram
             return true;
         }
         
+        //通过crc来加载ab，如果已经缓存了的就直接加载，否则就加载AB与其依赖
         public ResourceItem LoadResourceAssetBundle(uint crc)
         {
             ResourceItem item = null;
@@ -91,7 +91,6 @@ namespace MyRealFram
                     LoadAssetBundle(item.m_DependAssetBundle[i]);
                 }
             }
-            
             return item;
         }
         
@@ -105,7 +104,7 @@ namespace MyRealFram
                 AssetBundle assetBundle = null;
                 string fullPath = ABLoadPath + name;
                 assetBundle = AssetBundle.LoadFromFile(fullPath);
-                if (assetBundle != null)
+                if (assetBundle == null)
                 {
                     Debug.LogError("Load AssetBundle Error: "+fullPath);
                 }

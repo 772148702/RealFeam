@@ -108,7 +108,7 @@ namespace MyRealFram
                     Debug.LogError("找不到窗口对应的脚本，窗口名是：" + wndName);
                     return null;
                 }
-                GameObject wndObj = ObjectManager.Instance.InstantiateObject(m_UIPrefabPath + wndName, false, false);
+                GameObject wndObj = global::ObjectManager.Instance.InstantiateObject(m_UIPrefabPath + wndName, false, false);
                 if (wndObj == null)
                 {
                     Debug.Log("创建窗口Prefab失败：" + wndName);

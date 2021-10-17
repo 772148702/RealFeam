@@ -1,15 +1,17 @@
-﻿using System.IO;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
 using UnityEditor;
 using UnityEngine;
 
 public class MDataEdtior
 {
-    public static string abPath = MRealConfig.GetRealFram().abPath;
-    public static string xmlPath = MRealConfig.GetRealFram().xmlPath;
-    public static string binaryPath = MRealConfig.GetRealFram().binaryPath;
-    public static string scriptPath = MRealConfig.GetRealFram().scriptPath;
-    public static string excelPath = Application.dataPath + "../Data/MExcel/";
-    public static string regPath = Application.dataPath + "../Data/MReg";
+    public static string AbPath = MRealConfig.GetRealFram().abPath;
+    public static string XmlPath = MRealConfig.GetRealFram().xmlPath;
+    public static string BinaryPath = MRealConfig.GetRealFram().binaryPath;
+    public static string ScriptPath = MRealConfig.GetRealFram().scriptPath;
+    public static string ExcelPath = Application.dataPath + "../Data/MExcel/";
+    public static string RegPath = Application.dataPath + "../Data/MReg";
 
     [MenuItem("MAssets/类转Excel")]
     public static void AssetClassToXml()
@@ -53,7 +55,7 @@ public class MDataEdtior
     [MenuItem("MTools/Xml/Xml转成二进制")]
     public static void AllXmlToBinary()
     {
-        string path = Application.dataPath.Replace("Assets", "") + xmlPath;
+        string path = Application.dataPath.Replace("Assets", "") + XmlPath;
         string[] filesPath = Directory.GetFiles(path, "*.*", SearchOption.AllDirectories);
         for (int i = 0; i < filesPath.Length; i++)
         {
@@ -72,7 +74,7 @@ public class MDataEdtior
     [MenuItem("MTools/Xml/Excel转Xml")]
     public static void AllExcelToXml()
     {
-        string[] filePaths = Directory.GetFiles(regPath, "*", SearchOption.AllDirectories);
+        string[] filePaths = Directory.GetFiles(RegPath, "*", SearchOption.AllDirectories);
         for (int i = 0; i < filePaths.Length; i++)
         {
             if (!filePaths[i].EndsWith(".xml"))
@@ -84,5 +86,64 @@ public class MDataEdtior
 
         AssetDatabase.Refresh();
         EditorUtility.ClearProgressBar();
+    }
+
+    //将类转换成excel
+    public static void ClassToXml(string name)
+    {
+        if (string.IsNullOrEmpty(name))
+        {
+            return;
+        }
+
+        try
+        {
+            Type type = null;
+            foreach (var asm in AppDomain.CurrentDomain.GetAssemblies())
+            {
+                Type tempType = asm.GetType(name);
+                if (tempType != null)
+                {
+                    type = tempType;
+                    break;
+                }
+            }
+
+            if (type != null)
+            {
+                var temp = Activator.CreateInstance(type);
+                if (temp is ExcelBase)
+                {
+                    (temp as ExcelBase).Construction();
+                }
+
+                string xmlPath = XmlPath + name + ".xml";
+                BinarySerializeOpt.Xmlserialize(xmlPath, temp);
+                Debug.Log(name + "类转xml成功，xml路径为:" + xmlPath);
+            }
+            
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            throw;
+        }
+    }
+
+    public class SheetClass
+    {
+        public VarClass ParentVar { get; set; }
+        public int Depth { get; set; }
+        public string Name { get; set; }
+        public string SheetName { get; set; }
+        public string MainKey { get; set; }
+        public string SplitStr { get; set; }
+        public List<VarClass> VarList = new List<VarClass>();
+    }
+
+    public class VarClass
+    {
+        public string Name { get; set; }
+        public string Type { get; set; }
     }
 }

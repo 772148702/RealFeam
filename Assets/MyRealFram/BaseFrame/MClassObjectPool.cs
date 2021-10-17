@@ -1,58 +1,80 @@
 using  UnityEngine;
 using System.Collections.Generic;
 
-class MClassObjectPool<T> where T: class, new()
+namespace MyRealFram
 {
-    public bool spanwIfPoolEmpty = true;
-    public int needRecycleCount = 0;
-    public int MAX_SIZE = 50;
-    Stack<T> _stack = new Stack<T>();
-
-    public T Spawn()
-    {
-        if(_stack.Count>0)
-        {
-          T tempT= _stack.Pop();
-          needRecycleCount++;
-          if(tempT==null)
+  public class ClassObjectPool<T> where T :class, new()
+  {
+      //池
+      protected Stack<T> m_Pool = new Stack<T>();
+      //最大对象个数，<=0表示不限个数
+      protected int m_MaxCount = 0;
+      //没有回收的对象个数
+      protected int m_NoRecycleCount = 0;
+  
+      public ClassObjectPool(int maxcount)
+      {
+          m_MaxCount = maxcount;
+          for (int i = 0; i < maxcount; i++)
           {
-      
-             return tempT = new T();
-          } else 
-          {
-              return tempT;
+              m_Pool.Push(new T());
           }
-        }
-        else 
-        {
-            if(spanwIfPoolEmpty)
-            {
-                needRecycleCount++;
-                T tempT;
-                return tempT = new T();
-            } else {
-                return null;
-            }
-        }
-        return null;
-   }
-   
-   public bool Recycle(T obj)
-   {
-       if(obj==null){
-           return false;
-       }
-       needRecycleCount--;
-       if(_stack.Count>=MAX_SIZE&&MAX_SIZE>0) {
-           obj = null;
-           return false;
-       }
-
-      _stack.Push(obj);
-      obj = null;
-   
-      return true;
-   }
-
+      }
+  
+      /// <summary>
+      /// 从池里面取类对象
+      /// </summary>
+      /// <param name="creatIfPoolEmpty">如果为空是否new出来</param>
+      /// <returns></returns>
+      public T Spawn(bool creatIfPoolEmpty)
+      {
+          if (m_Pool.Count > 0)
+          {
+              T rtn = m_Pool.Pop();
+              if (rtn == null)
+              {
+                  if (creatIfPoolEmpty)
+                  {
+                      rtn = new T();
+                  }
+              }
+              m_NoRecycleCount++;
+              return rtn;
+          }
+          else
+          {
+              if (creatIfPoolEmpty)
+              {
+                  T rtn = new T();
+                  m_NoRecycleCount++;
+                  return rtn;
+              }
+          }
+  
+          return null;
+      }
+  
+      /// <summary>
+      /// 回收类对象
+      /// </summary>
+      /// <param name="obj"></param>
+      /// <returns></returns>
+      public bool Recycle(T obj)
+      {
+          if (obj == null)
+              return false;
+  
+          m_NoRecycleCount--;
+  
+          if (m_Pool.Count >= m_MaxCount && m_MaxCount > 0)
+          {
+              obj = null;
+              return false;
+          }
+  
+          m_Pool.Push(obj);
+          return true;
+      }
+  }
 
 }
