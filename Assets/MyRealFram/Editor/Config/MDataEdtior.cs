@@ -143,7 +143,58 @@ public class MDataEdtior
 
     public class VarClass
     {
+        //变量名称
         public string Name { get; set; }
+        //变量类型
         public string Type { get; set; }
+        //变量中的excel中的列
+        public string Col { get; set; }
+        //变量的默认值
+        public string DefaultValue { get; set; }
+        //变量是list的话，外联部分列
+        public string Foregin { get; set; }
+        //分隔符号
+        public string SplitStr { get; set; }
+        //如果自己是List，对应的list类名
+        public string ListName { get; set; }
+        //如果自己是list，对应的sheet名字
+        public string ListSheetName { get; set; }
+    }
+
+    public class SheetData
+    {
+        public List<string> AllName = new List<string>();
+        public List<string> AllType = new List<string>();
+        public List<RowData> AllData = new List<RowData>();
+    }
+
+    public class RowData
+    {
+        public string ParnetValue = "";
+        public Dictionary<string, string> RowDataDic = new Dictionary<string, string>();
+    }
+
+    public enum TestEnum
+    {
+        None = 0,
+        VAR1=1,
+        Test2=2
+    }
+
+    public class TestInfo
+    {
+        public int Id { get; set; }
+        public string Name { get; set; }
+        public bool IsA { get; set; }
+        public bool Heigh { get; set; }
+        public TestEnum TestType { get; set; }
+        public List<string> AllStrList { get; set; }
+        public List<TestInfoTwo> AllTestInfoList { get; set; }
+    }
+
+    public class TestInfoTwo
+    {
+        public int Id { get; set; }
+        public string Name { get; set; }
     }
 }
