@@ -13,6 +13,17 @@ public class MDataEdtior
     public static string ExcelPath = Application.dataPath + "../Data/MExcel/";
     public static string RegPath = Application.dataPath + "../Data/MReg";
 
+    
+    [MenuItem("MBuild/isLoadFromAb", true)]
+    public static bool MenuLogOutCheck()
+    {
+        MyRealFram.ResourceManager.Instance.m_LoadFromAssetBundle =
+            !MyRealFram.ResourceManager.Instance.m_LoadFromAssetBundle;
+        Menu.SetChecked("MBuild/isLoadFromAb", MyRealFram.ResourceManager.Instance.m_LoadFromAssetBundle );
+        return MyRealFram.ResourceManager.Instance.m_LoadFromAssetBundle;
+    }
+
+    
     [MenuItem("MAssets/类转Excel")]
     public static void AssetClassToXml()
     {

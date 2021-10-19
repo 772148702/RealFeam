@@ -103,7 +103,8 @@ namespace MyRealFram
     public class ResourceManager:Singleton<ResourceManager>
     {
         protected long m_Guid = 0;
-        public bool m_LoadFromAssetBundle = true;
+        public bool m_LoadFromAssetBundle = false;
+
         //缓存的资源列表
         public Dictionary<uint,ResourceItem> AssetDic { get; set; } = new Dictionary<uint, ResourceItem>();
         //缓存引用引用为零的资源列表，达到醉倒缓存的时候释放最早没用的资源
@@ -125,11 +126,14 @@ namespace MyRealFram
 
         public void Init(MonoBehaviour mono)
         {
+            //加载配置文件
+            MyRealFram.AssetBundleManager.Instance.LoadAssetBundleConfig();
+            //创建加载队列
             for (int i = 0; i < (int) LoadResPriority.RES_NUM; i++)
             {
                 m_LoadingAssetList[i] = new List<AsyncLoadResParam>();
             }
-
+            //开启协程
             m_Startmono = mono;
             m_Startmono.StartCoroutine(AsyncLoadCor());
         }
