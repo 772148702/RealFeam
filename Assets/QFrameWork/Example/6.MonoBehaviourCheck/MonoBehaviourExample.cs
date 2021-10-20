@@ -20,7 +20,7 @@ namespace QFrameWork
     {
         private void Awake()
         {
-            Delay(1.0f,()=>
+            this.Delay(1.0f,()=>
             {
 #if UNITY_EDITOR
                 UnityEditor.EditorApplication.isPlaying = false;
@@ -38,7 +38,7 @@ namespace QFrameWork
     {
         private void Awake()
         {
-            Delay(1.0f,()=>
+            this.Delay(1.0f,()=>
             {
                 RegisterMsg("msg1",MsgFun1);
                 RegisterMsg("msg1",MsgFun1);

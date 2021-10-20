@@ -197,6 +197,7 @@ namespace MyRealFram
                 if (m_RefCount < 0)
                 {
                     Debug.LogError("refcount < 0" + m_RefCount + " ," + (m_Obj != null ? m_Obj.name : "name is null"));
+                    
                 }
             }
         }

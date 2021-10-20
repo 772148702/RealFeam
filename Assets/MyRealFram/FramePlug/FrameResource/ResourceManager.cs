@@ -32,7 +32,7 @@ namespace MyRealFram
         //是否放到场景节点下面
         public bool m_SetSceneParent = false;
         //实例化资源加载完成回调
-        public OnAsyncObjFinish m_DealFinish = null;
+        public OnAsyncObjectFinish m_DealObjFinish = null;
         //异步参数
         public object m_Param1, m_Param2, m_Param3 = null;
         //离线数据
@@ -47,7 +47,7 @@ namespace MyRealFram
             m_ResItem = null;
             m_Already = false;
             m_SetSceneParent = false;
-            m_DealFinish = null;
+            m_DealObjFinish = null;
             m_Param1 = m_Param2 = m_Param3 = null;
             m_OfflineData = null;
         }
@@ -74,31 +74,32 @@ namespace MyRealFram
 
     public class AsyncCallBack
     {
-        public OnAsyncFinsih m_DealFinish = null;
+        //资源加载完成后的回调，一般框架内定
+        public OnAsyncResourceObjFinish MDealResourceObjFinish = null;
 
         public ResourceObj m_ResObj = null;
 
-        public OnAsyncObjFinish m_DealObjFinish = null;
+        //资源加载后的回调（一般不用于实例化）
+        public OnAsyncObjectFinish MDealObjectFinish = null;
 
         public object m_Param1 = null, m_Param2 = null, m_Param3 = null;
 
         public void Reset()
         {
-            m_DealObjFinish = null;
-            m_DealFinish = null;
+            MDealObjectFinish = null;
+            MDealResourceObjFinish = null;
             m_Param1 = null;
             m_Param2 = null;
             m_Param3 = null;
         }
     }
-    //资源加载完成回调
-    public delegate void OnAsyncObjFinish(string path, Object obj, object param1 = null, object param2 = null,
+  
+    public delegate void OnAsyncObjectFinish(string path, Object obj, object param1 = null, object param2 = null,
         object param3 = null);
     
-    
-    
-    //实例化对象完成回调
-    public delegate void OnAsyncFinsih(string path, ResourceObj resouceObj, object param1 = null, object param2 = null,
+  
+    public delegate void OnAsyncResourceObjFinish
+    (string path, ResourceObj resouceObj, object param1 = null, object param2 = null,
         object param3 = null);
     public class ResourceManager:Singleton<ResourceManager>
     {
@@ -242,21 +243,21 @@ namespace MyRealFram
                     for (int j = 0; j < callBackList.Count; j++)
                     {
                         AsyncCallBack callBack = callBackList[j];
-                        if (callBack != null && callBack.m_DealFinish != null && callBack.m_ResObj != null)
+                        if (callBack != null && callBack.MDealResourceObjFinish != null && callBack.m_ResObj != null)
                         {
                             ResourceObj tempResourceObj = callBack.m_ResObj;
                             tempResourceObj.m_ResItem = item;
-                            callBack.m_DealFinish(loadingItem.m_Path, tempResourceObj, tempResourceObj.m_Param1,
+                            callBack.MDealResourceObjFinish(loadingItem.m_Path, tempResourceObj, tempResourceObj.m_Param1,
                                 tempResourceObj.m_Param2, tempResourceObj.m_Param3);
-                            callBack.m_DealFinish = null;
+                            callBack.MDealResourceObjFinish = null;
                             tempResourceObj = null;
                         }
 
-                        if (callBack != null && callBack.m_DealObjFinish != null)
+                        if (callBack != null && callBack.MDealObjectFinish != null)
                         {
-                            callBack.m_DealObjFinish(loadingItem.m_Path, obj, callBack.m_Param1, callBack.m_Param2,
+                            callBack.MDealObjectFinish(loadingItem.m_Path, obj, callBack.m_Param1, callBack.m_Param2,
                                 callBack.m_Param3);
-                            callBack.m_DealObjFinish = null;
+                            callBack.MDealObjectFinish = null;
                         }
                         callBack.Reset();
                         m_AsyncCallBackPool.Recycle(callBack);
@@ -440,6 +441,7 @@ namespace MyRealFram
             return true;
         }
         
+        //释放资源
         public bool ReleaseResource(ResourceObj resObj, bool destoryObj = false)
         {
             if (resObj == null)
@@ -656,7 +658,7 @@ namespace MyRealFram
             //释放assetbundle引用
             AssetBundleManager.Instance.ReleaseAsset(item);
             //清空资源对应的对象池
-            global::ObjectManager.Instance.ClearPoolObject(item.m_Crc);
+            ObjectManager.Instance.ClearPoolObject(item.m_Crc);
 
             if (item.m_Obj != null)
             {
@@ -673,9 +675,11 @@ namespace MyRealFram
         {
             return UnityEditor.AssetDatabase.LoadAssetAtPath<T>(path);
         }
-#endif
-
-        public void AsyncLoadResource(string path, OnAsyncObjFinish dealFinish, LoadResPriority priority,
+#endif  
+        /// <summary>
+        /// 异步加载资源（仅仅是不需要实例化的资源，例如音频，图片等等）
+        /// </summary>
+        public void AsyncLoadResource(string path, OnAsyncObjectFinish dealFinish, LoadResPriority priority,
             bool isSprite = false, object param1 = null, object param2 = null, object param3 = null, uint crc = 0)
         {
             if (crc == 0)
@@ -707,14 +711,21 @@ namespace MyRealFram
             
             //往回调列表里面加回调
             AsyncCallBack callBack = m_AsyncCallBackPool.Spawn(true);
-            callBack.m_DealObjFinish = dealFinish;
+            callBack.MDealObjectFinish = dealFinish;
             callBack.m_Param1 = param1;
             callBack.m_Param2 = param2;
             callBack.m_Param3 = param3;
             para.m_CallBackList.Add(callBack);
         }
 
-        public void AsyncLoadResource(string path, ResourceObj resObj, OnAsyncFinsih dealfinish,
+        /// <summary>
+        /// 针对ObjectManager的异步加载接口
+        /// </summary>
+        /// <param name="path"></param>
+        /// <param name="resObj"></param>
+        /// <param name="dealfinish"></param>
+        /// <param name="priority"></param>
+        public void AsyncLoadResource(string path, ResourceObj resObj, OnAsyncResourceObjFinish dealfinish,
             LoadResPriority priority)
         {
             ResourceItem item = GetCacheResourceItem(resObj.m_Crc);
@@ -740,7 +751,7 @@ namespace MyRealFram
             }
 
             AsyncCallBack callback = m_AsyncCallBackPool.Spawn(true);
-            callback.m_DealFinish = dealfinish;
+            callback.MDealResourceObjFinish = dealfinish;
             callback.m_ResObj = resObj;
             para.m_CallBackList.Add(callback);
         }
