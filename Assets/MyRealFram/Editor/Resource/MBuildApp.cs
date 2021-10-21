@@ -7,7 +7,7 @@ using System.Linq;
 using UnityEditor;
 using UnityEngine;
 
-namespace MyRealFram
+namespace MyRealFrame
 {
     public class MBuildApp
     {
@@ -20,12 +20,50 @@ namespace MyRealFram
         public static void BuildAssetBundle()
         {
             DeleteDir(Application.streamingAssetsPath);
-            MyRealFram.BundleEditor.Build();
+            BundleEditor.Build();
             string abPath = Application.dataPath + "/../AssetBundle/" +
                             EditorUserBuildSettings.activeBuildTarget.ToString() + "/";
             Copy(abPath, Application.streamingAssetsPath);
         }
 
+        public static void SaveVersion(string version, string package)
+        {
+            string content = String.Format("Version|{0};PackageName|{1};", version, package);
+            string dir = Application.streamingAssetsPath + "/Resources/";
+            string savePath = Application.streamingAssetsPath + "/Resources/Version.txt";
+            if (!Directory.Exists(dir))
+            {
+                Directory.CreateDirectory(dir);
+            }
+            string oneLine = "";
+            string all = "";
+            //读取所有的内容
+            using (FileStream fs = new FileStream(savePath, FileMode.OpenOrCreate, FileAccess.ReadWrite,FileShare.ReadWrite))
+            {
+                using (StreamReader sr = new StreamReader(fs, System.Text.Encoding.UTF8))
+                {
+                    all = sr.ReadToEnd();
+                    oneLine = all.Split('\r')[0];
+                }
+            }
+            //替换资源版本号
+            using (FileStream fs = new FileStream(savePath, FileMode.OpenOrCreate))
+            {
+                using (StreamWriter sw = new StreamWriter(fs, System.Text.Encoding.UTF8))
+                {
+                    if (string.IsNullOrEmpty(all))
+                    {
+                        all = content;
+                    }
+                    else
+                    {
+                        all = all.Replace(oneLine, content);
+                    }
+                    sw.Write(all);
+                }
+            }
+        }
+        
         public static string GetSavePath()
         {
             string savePath = "";
@@ -49,7 +87,7 @@ namespace MyRealFram
         {   
             DeleteDir(Application.streamingAssetsPath);
             //打AB包
-            MyRealFram.BundleEditor.Build();
+            BundleEditor.Build();
             //生成可执行程序
             string abPath = Application.dataPath + "/../AssetBundle/" +
                             EditorUserBuildSettings.activeBuildTarget.ToString() + "/";

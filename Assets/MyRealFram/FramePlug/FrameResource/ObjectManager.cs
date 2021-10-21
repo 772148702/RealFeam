@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace MyRealFram
+namespace MyRealFrame
 {
     public class ObjectManager:Singleton<ObjectManager>
     {

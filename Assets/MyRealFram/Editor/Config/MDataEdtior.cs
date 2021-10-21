@@ -17,10 +17,10 @@ public class MDataEdtior
     [MenuItem("MBuild/isLoadFromAb", true)]
     public static bool MenuLogOutCheck()
     {
-        MyRealFram.ResourceManager.Instance.m_LoadFromAssetBundle =
-            !MyRealFram.ResourceManager.Instance.m_LoadFromAssetBundle;
-        Menu.SetChecked("MBuild/isLoadFromAb", MyRealFram.ResourceManager.Instance.m_LoadFromAssetBundle );
-        return MyRealFram.ResourceManager.Instance.m_LoadFromAssetBundle;
+        MyRealFrame.ResourceManager.Instance.m_LoadFromAssetBundle =
+            !MyRealFrame.ResourceManager.Instance.m_LoadFromAssetBundle;
+        Menu.SetChecked("MBuild/isLoadFromAb", MyRealFrame.ResourceManager.Instance.m_LoadFromAssetBundle );
+        return MyRealFrame.ResourceManager.Instance.m_LoadFromAssetBundle;
     }
 
     

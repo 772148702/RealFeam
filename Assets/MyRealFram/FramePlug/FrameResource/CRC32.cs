@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-namespace MyRealFram
+namespace MyRealFrame
 {
     //字符串生成crc
         public class Crc32

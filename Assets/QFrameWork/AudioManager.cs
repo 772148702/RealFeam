@@ -20,7 +20,7 @@ namespace QFrameWork
         {
             CheckAudioListener();
             var   aduioSource = gameObject.AddComponent<AudioSource>();
-            var coinSound = MyRealFram.ResourceManager.Instance.LoadResource<AudioClip>(soundName);
+            var coinSound = MyRealFrame.ResourceManager.Instance.LoadResource<AudioClip>(soundName);
             aduioSource.clip = coinSound;
             aduioSource.Play();
         }
@@ -32,7 +32,7 @@ namespace QFrameWork
             {
                 mMusicSource = gameObject.AddComponent<AudioSource>();
             }
-            var coinSound = MyRealFram.ResourceManager.Instance.LoadResource<AudioClip>(musicName);
+            var coinSound = MyRealFrame.ResourceManager.Instance.LoadResource<AudioClip>(musicName);
             mMusicSource.clip = coinSound;
             mMusicSource.loop = loop;
             mMusicSource.Play();

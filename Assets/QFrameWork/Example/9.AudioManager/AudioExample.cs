@@ -16,8 +16,8 @@ namespace QFramework
 #endif
         private void Awake()
         {
-            MyRealFram.ResourceManager.Instance.Init(this);
-            MyRealFram.ObjectManager.Instance.Init();
+            MyRealFrame.ResourceManager.Instance.Init(this);
+            MyRealFrame.ObjectManager.Instance.Init();
         }
 
         private void Start()

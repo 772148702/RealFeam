@@ -1,7 +1,7 @@
 using  UnityEngine;
 using System.Collections.Generic;
 
-namespace MyRealFram
+namespace MyRealFrame
 {
   public class ClassObjectPool<T> where T :class, new()
   {

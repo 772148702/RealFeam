@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-namespace MyRealFram
+namespace MyRealFrame
 {
     public enum UIMsgId
     {
@@ -21,7 +21,7 @@ namespace MyRealFram
         //注册的字典
         private Dictionary<string, System.Type> m_RegisterDic = new Dictionary<string, Type>();
         private Dictionary<string, Window> m_WindowDic = new Dictionary<string, Window>();
-        private List<MyRealFram.Window> m_WindowList = new List<MyRealFram.Window>();
+        private List<Window> m_WindowList = new List<Window>();
 
         public void Init(RectTransform uiRoot, RectTransform wndRoot, Camera uiCamera, EventSystem eventSystem)
         {

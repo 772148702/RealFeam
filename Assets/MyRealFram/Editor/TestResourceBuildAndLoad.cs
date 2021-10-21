@@ -1,7 +1,7 @@
 ﻿using UnityEditor;
 using UnityEngine;
 
-namespace MyRealFram
+namespace MyRealFrame
 {
     public class TestResourceBuildAndLoad
     {
@@ -9,7 +9,7 @@ namespace MyRealFram
         public static void BuildPkg()
         {
             
-            MyRealFram.BundleEditor.Build();
+            BundleEditor.Build();
         }
         [MenuItem("MBuild/Test/1.加载")]
         public static void ResourceLoadConfigureTest()
@@ -28,5 +28,12 @@ namespace MyRealFram
         {
             MBuildApp.Build();
         }
+        
+        [MenuItem("MBuild/资源版本号")]
+        public static void BuildVersionNumber()
+        {
+            MBuildApp.SaveVersion("1.0","realFrame");
+        }
+        
     }
 }

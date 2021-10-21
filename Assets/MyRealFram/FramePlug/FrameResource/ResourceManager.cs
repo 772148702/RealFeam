@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
-namespace MyRealFram
+namespace MyRealFrame
 {
 
     public enum LoadResPriority
@@ -128,7 +128,7 @@ namespace MyRealFram
         public void Init(MonoBehaviour mono)
         {
             //加载配置文件
-            MyRealFram.AssetBundleManager.Instance.LoadAssetBundleConfig();
+            AssetBundleManager.Instance.LoadAssetBundleConfig();
             //创建加载队列
             for (int i = 0; i < (int) LoadResPriority.RES_NUM; i++)
             {

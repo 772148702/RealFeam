@@ -4,7 +4,7 @@ using System.IO;
 using UnityEngine;
 using System.Xml.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
-using MyRealFram;
+using MyRealFrame;
 
 
 public class ResourceTest : MonoBehaviour
@@ -22,7 +22,7 @@ public class ResourceTest : MonoBehaviour
 
     void TestLoadAB()
     {
-        MyRealFram.AssetBundleManager.Instance.LoadAssetBundleConfig();
+        MyRealFrame.AssetBundleManager.Instance.LoadAssetBundleConfig();
         // AssetBundle configAB = AssetBundle.LoadFromFile (Path.Combine(Application.streamingAssetsPath , "assetbundleconfig"));
         // TextAsset textAsset = configAB.LoadAsset<TextAsset>("AssetBundleConfig");
         // if (textAsset == null)

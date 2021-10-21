@@ -4,7 +4,7 @@ using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 using UnityEngine;
 
-namespace MyRealFram
+namespace MyRealFrame
 {
     public class AssetBundleManager : Singleton<AssetBundleManager>
     {
@@ -45,12 +45,12 @@ namespace MyRealFram
 
             MemoryStream memoryStream = new MemoryStream(textAsset.bytes);
             BinaryFormatter bf = new BinaryFormatter();
-            MyRealFram.AssetBundleConfig config = (MyRealFram.AssetBundleConfig) bf.Deserialize(memoryStream);
+            AssetBundleConfig config = (AssetBundleConfig) bf.Deserialize(memoryStream);
             memoryStream.Close();
             for (int i = 0; i < config.AbBases.Count; i++)
             {
                 ABBase abBase = config.AbBases[i];
-                MyRealFram.ResourceItem item = new MyRealFram.ResourceItem();
+                ResourceItem item = new ResourceItem();
                 item.m_Crc = abBase.Crc;
                 item.m_AssetName = abBase.AssetName;
                 item.m_ABName = abBase.ABName;

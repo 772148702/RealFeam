@@ -1,5 +1,6 @@
 ﻿
 
+    using System;
     using System.Collections.Generic;
     using System.IO;
     using System.Runtime.Serialization.Formatters.Binary;
@@ -9,11 +10,12 @@
     using UnityEngine;
     using FileMode = System.IO.FileMode;
 
-    namespace MyRealFram
+    namespace MyRealFrame
     {
         public class BundleEditor
         {
             private static string m_BundleTargetPath = Application.dataPath+"/../AssetBundle/"+ EditorUserBuildSettings.activeBuildTarget.ToString();
+            private static string m_HotPath = Application.dataPath+"/Hot/"+EditorUserBuildSettings.activeBuildTarget.ToString();
             private static string ABCONFIGPATH = "Assets/MyRealFram/Editor/Resource/MABConfig.asset";
             private static string ABBYTEPATH = MRealConfig.GetRealFram().abPath;
             //key是ab包名,value是路径，所有文件夹ab包dic
@@ -24,8 +26,9 @@
             private static Dictionary<string, List<string>> m_AllPrefabDir = new Dictionary<string, List<string>>();
             //储存所有的有效路径
             private static List<string> m_ConfigFil = new List<string>();
-
-         
+            //store the md5 information
+            private static Dictionary<string, ABMD5Base> m_PackMd5 = new Dictionary<string, ABMD5Base>();
+            
             public static void Build()
             {
                 EditorUtility.ClearProgressBar();
@@ -159,13 +162,13 @@
             //生成对于item选项 Disctionary<path,ABName>
             static void WriteData(Dictionary<string,string> resPathDic)
             {
-                MyRealFram.AssetBundleConfig config = new MyRealFram.AssetBundleConfig();
+                AssetBundleConfig config = new AssetBundleConfig();
                 config.AbBases = new List<ABBase>();
                 foreach (var path in resPathDic.Keys)
                 {
                     if(!ValidPath(path)) continue;
 
-                    MyRealFram.ABBase abBase = new MyRealFram.ABBase();
+                    ABBase abBase = new ABBase();
                     abBase.Path = path;
                     abBase.Crc = Crc32.GetCrc32(path);
                     abBase.ABName = resPathDic[path];
@@ -298,6 +301,105 @@
                 }
                 return false;
             }
+            //ab都在同一级文件？
+            static void ReadMd5Com(string abMd5Path, string hotCount)
+            {
+                m_PackMd5.Clear();
+                using (FileStream fs = new FileStream(abMd5Path, FileMode.OpenOrCreate, FileAccess.Read,
+                    FileShare.ReadWrite))
+                {
+                    BinaryFormatter bf = new BinaryFormatter();
+                    ABMD5 abmd5 = bf.Deserialize(fs) as ABMD5;
+                    foreach (var item in abmd5.ABMD5List)
+                    {
+                        m_PackMd5.Add(item.Name,item);
+                    }
+                }
+
+                List<string> changeList = new List<string>();
+                DirectoryInfo directoryInfo = new DirectoryInfo(m_BundleTargetPath);
+                FileInfo[] fileInfos = directoryInfo.GetFiles("*", SearchOption.AllDirectories);
+                for (int i = 0; i < fileInfos.Length; i++)
+                {
+                    if (!fileInfos[i].Name.EndsWith(".meta") && !fileInfos[i].Name.EndsWith(".manifest"))
+                    {
+                        string name = fileInfos[i].Name;
+                        string md5 = MD5Manager.Instance.BuildFileMd5(fileInfos[i].FullName);
+                        ABMD5Base abmd5Base = null;
+                        if (!m_PackMd5.ContainsKey(name))
+                        {
+                            changeList.Add(name);
+                        }
+                        else
+                        {
+                            if (m_PackMd5.TryGetValue(name, out abmd5Base))
+                            {
+                                if (abmd5Base.Md5 != md5)
+                                {
+                                    changeList.Add(name);
+                                }
+                            }
+                        }
+                    }
+                }
+                //to CopyTable
+            }
+
+            public static void DeleteAllFile(string fullpath)
+            {
+                if (Directory.Exists(fullpath))
+                {
+                    DirectoryInfo directoryInfo = new DirectoryInfo(fullpath);
+                    FileInfo[] fileInfos = directoryInfo.GetFiles();
+                    foreach (var item in fileInfos)
+                    {
+                        if (item.Name.EndsWith(".meta"))
+                        {
+                            continue;
+                        }
+
+                        File.Delete(item.FullName);
+                    }
+                }
+            }
+            
+            static void CopyABAndGenerateXml(List<string> changeList, string hotCount)
+            {
+                if (!Directory.Exists(m_HotPath))
+                {
+                    Directory.CreateDirectory(m_HotPath);
+                }
+
+                DeleteAllFile(m_HotPath);
+                foreach (var str in changeList)
+                {
+                    if (!str.EndsWith(".manifest"))
+                    {
+                        File.Copy(m_BundleTargetPath+"/"+str,m_HotPath+"/"+str);
+                    }
+                }
+                
+                //server produce patch
+                DirectoryInfo directoryInfo = new DirectoryInfo(m_HotPath);
+                FileInfo[] files = directoryInfo.GetFiles("*", SearchOption.AllDirectories);
+                Patches patches = new Patches();
+                patches.Version = 1;
+                patches.Files = new List<Patch>();
+                for (int i = 0; i < files.Length; i++)
+                {
+                    Patch patch = new Patch();
+                    patch.Md5 = MD5Manager.Instance.BuildFileMd5(files[i].FullName);
+                    patch.Name = files[i].Name;
+                    patch.Size = files[i].Length / 1024.0f;
+                    patch.Platform = EditorUserBuildSettings.activeBuildTarget.ToString();
+                    patch.Url = "http://127.0.0.1/AssetBundle/" + PlayerSettings.bundleVersion + "/" + hotCount + "/" +
+                                files[i].Name;
+                    patches.Files.Add(patch);
+                }
+
+                BinarySerializeOpt.Xmlserialize(m_HotPath + "/Patch.xml", patches);
+            }
+            
         }
         
     }

@@ -3,7 +3,7 @@ using System.Collections;
 using UnityEngine;
 
 
-namespace MyRealFram
+namespace MyRealFrame
 {
     public class BaseItem:MonoBehaviour
     {

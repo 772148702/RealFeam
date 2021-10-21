@@ -22,7 +22,7 @@ namespace QFrameWork
                 if (mPrivateUiRoot == null)
                 {
                    
-                    MyRealFram.ObjectManager.Instance.InstantiateObjAsync("Assets/GameData/UGUI/UIRoot.prefab",(
+                    MyRealFrame.ObjectManager.Instance.InstantiateObjAsync("Assets/GameData/UGUI/UIRoot.prefab",(
                         (path, o, param1, param2, param3) =>
                         {
                             mPrivateUiRoot = o as GameObject;
@@ -46,7 +46,7 @@ namespace QFrameWork
         public static GameObject LoadPanel(string path,UILayer layer)
         {
             
-           GameObject obj =   MyRealFram.ResourceManager.Instance.LoadResource<GameObject>(path);
+           GameObject obj =   MyRealFrame.ResourceManager.Instance.LoadResource<GameObject>(path);
            var panel = GameObject.Instantiate(obj);
            switch (layer)
            {
@@ -79,7 +79,7 @@ namespace QFrameWork
                 Debug.Log("Start to Load UIRoot");
             }
             
-            MyRealFram.ObjectManager.Instance.InstantiateObjAsync(resPath,(
+            MyRealFrame.ObjectManager.Instance.InstantiateObjAsync(resPath,(
                 (path, o, param1, param2, param3) =>
                 {
                       panel = o as GameObject;

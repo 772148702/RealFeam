@@ -2,7 +2,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace MyRealFram
+namespace MyRealFrame
 {
     public class Window
     {
