@@ -6,8 +6,10 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 
-class MMonoSingleleton<T> : MonoBehaviour where T: MMonoSingleleton<T>
+namespace MyRealFrame
 {
+    class MonoSingleleton<T> : MonoBehaviour where T: MonoSingleleton<T>
+    {
         public static T Instance
         {
             get
@@ -34,5 +36,7 @@ class MMonoSingleleton<T> : MonoBehaviour where T: MMonoSingleleton<T>
                 UnityEngine.Debug.Log("Singleleton error");
             }
         }
+    }
 }
+
 

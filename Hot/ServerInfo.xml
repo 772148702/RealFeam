@@ -1,0 +1,11 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ServerInfo xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <GameVersion Version="0.1">
+    <Patches Version="1">
+      <Files Name="assetbundleconfig" Url="http://127.0.0.1:8000/Hot/StandaloneWindows64/0.1/1/assetbundleconfig" Platform="StandaloneWindows64" Md5="41ad7dbf839db7b17da58c8ce7860ec7" Size="3.23339844" />
+      <Files Name="AssetBundleConfig.xml" Url="http://127.0.0.1:8000/Hot/StandaloneWindows64/0.1/1/AssetBundleConfig.xml" Platform="StandaloneWindows64" Md5="c760ba2717a76d393e5c905c42c212c7" Size="8.7421875" />
+      <Files Name="StandaloneWindows64" Url="http://127.0.0.1:8000/Hot/StandaloneWindows64/0.1/1/StandaloneWindows64" Platform="StandaloneWindows64" Md5="756a62e566853c63656211f1beaf2cdf" Size="1.77636719" />
+      <Files Name="ugui" Url="http://127.0.0.1:8000/Hot/StandaloneWindows64/0.1/1/ugui" Platform="StandaloneWindows64" Md5="8209033533f87fc2fa78987189e27d7f" Size="212.489258" />
+    </Patches>
+  </GameVersion>
+</ServerInfo>

@@ -35,7 +35,10 @@ namespace MyRealFrame
 #endif
             m_ResouceItemDic.Clear();
             string configPath = ABLoadPath + m_ABConfigABName;
+            string hotABPath = HotPatchManager.Instance.ComputeABPath(m_ABConfigABName);
+            configPath = string.IsNullOrEmpty(hotABPath) ? configPath : hotABPath;
             AssetBundle configAB = AssetBundle.LoadFromFile(configPath);
+            
             TextAsset textAsset = configAB.LoadAsset<TextAsset>(m_ABConfigABName);
             if (textAsset == null)
             {
@@ -102,7 +105,8 @@ namespace MyRealFrame
             if (!m_AssetBundleItemDic.TryGetValue(crc, out item))
             {
                 AssetBundle assetBundle = null;
-                string fullPath = ABLoadPath + name;
+                string hotABPath = HotPatchManager.Instance.ComputeABPath(name);
+                string fullPath = string.IsNullOrEmpty(hotABPath)? ABLoadPath + name: hotABPath;
                 assetBundle = AssetBundle.LoadFromFile(fullPath);
                 if (assetBundle == null)
                 {

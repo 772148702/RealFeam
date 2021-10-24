@@ -1,21 +1,26 @@
-﻿
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Runtime.Serialization.Formatters.Binary;
+using System.Xml.Serialization;
+using UnityEditor;
 
-    using System;
-    using System.Collections.Generic;
-    using System.IO;
-    using System.Runtime.Serialization.Formatters.Binary;
-    using System.Xml.Serialization;
-    using UnityEditor;
-    using UnityEditor.VersionControl;
-    using UnityEngine;
-    using FileMode = System.IO.FileMode;
+using UnityEngine;
+using FileMode = System.IO.FileMode;
 
     namespace MyRealFrame
     {
         public class BundleEditor
         {
             private static string m_BundleTargetPath = Application.dataPath+"/../AssetBundle/"+ EditorUserBuildSettings.activeBuildTarget.ToString();
-            private static string m_HotPath = Application.dataPath+"/Hot/"+EditorUserBuildSettings.activeBuildTarget.ToString();
+
+            private static string m_VersionMd5Path = Application.dataPath + "/../Version/" +
+                                                     EditorUserBuildSettings.activeBuildTarget.ToString();
+
+            private static string m_FilePrefix = "Hot/" + EditorUserBuildSettings.activeBuildTarget.ToString();
+            //current hot fix path 
+            private static string m_HotPath = Application.dataPath+"/../Hot/"+EditorUserBuildSettings.activeBuildTarget.ToString();
             private static string ABCONFIGPATH = "Assets/MyRealFram/Editor/Resource/MABConfig.asset";
             private static string ABBYTEPATH = MRealConfig.GetRealFram().abPath;
             //key是ab包名,value是路径，所有文件夹ab包dic
@@ -29,7 +34,7 @@
             //store the md5 information
             private static Dictionary<string, ABMD5Base> m_PackMd5 = new Dictionary<string, ABMD5Base>();
             
-            public static void Build()
+            public static void Build(bool hotfix=false,string abmd5Path="",string hotCount="1")
             {
                 EditorUtility.ClearProgressBar();
                 DataEditor.AllExcelToXml();
@@ -103,9 +108,22 @@
                     AssetDatabase.RemoveAssetBundleName(oldNames[i],true);
                     EditorUtility.DisplayProgressBar("清除AB包名字","名字: "+oldNames[i],i*1.0f/oldNames.Length);
                 }
+
+                if (hotfix)
+                {
+                    ReadMd5Com(abmd5Path,hotCount);
+                }
+                else
+                {
+                    WriteABMD5();
+                }
+                
                 AssetDatabase.SaveAssets();
                 AssetDatabase.Refresh();
                 EditorUtility.ClearProgressBar();
+                
+                
+                
             }
             //根据刚刚设置的ab名字得到相应的路径，由此生成相应的item
             static void BuildAssetBundle()
@@ -343,8 +361,51 @@
                     }
                 }
                 //to CopyTable
+                CopyABAndGenerateXml(changeList,hotCount);
             }
+            
+            
+            //gengerate md5 files, which will be useful in hotfix patches
+            static void WriteABMD5()
+            {
+                DirectoryInfo directoryInfo = new DirectoryInfo(m_BundleTargetPath);
+                FileInfo[] fileInfos = directoryInfo.GetFiles("*", SearchOption.AllDirectories);
+                ABMD5 abmd5 = new ABMD5();
+                abmd5.ABMD5List = new List<ABMD5Base>();
+                foreach (var item in fileInfos)
+                {
+                    if (!item.Name.EndsWith(".cs") && !item.Name.EndsWith(".manifest"))
+                    {
+                        ABMD5Base abmd5Base = new ABMD5Base();
+                        abmd5Base.Name = item.Name;
+                        abmd5Base.Md5 = MD5Manager.Instance.BuildFileMd5(item.FullName);
+                        abmd5Base.Size = item.Length / 1024.0f;
+                        abmd5.ABMD5List.Add(abmd5Base);
+                    }
+                }
 
+                string ABMD5Path = Application.dataPath + "/Resources/ABMD5.bytes";
+                UnityEngine.Debug.Log(String.Format("produce md5 file in {0}",ABMD5Path));
+                BinarySerializeOpt.BinarySerialize(ABMD5Path, abmd5);
+                
+                
+                //save the .b in external file
+                if (!Directory.Exists(m_VersionMd5Path))
+                {
+                    Directory.CreateDirectory(m_VersionMd5Path);
+                }
+
+                string targetPath = m_VersionMd5Path + "/ABMD5_" + PlayerSettings.bundleVersion + ".bytes";
+                if (File.Exists(targetPath))
+                {
+                    File.Delete(targetPath);
+                }
+                UnityEngine.Debug.Log(String.Format("copy md5 file from {0} to {1}",ABMD5Path,targetPath));
+                File.Copy(ABMD5Path,targetPath);
+                
+            }
+            
+            
             public static void DeleteAllFile(string fullpath)
             {
                 if (Directory.Exists(fullpath))
@@ -363,22 +424,22 @@
                 }
             }
             
+            //todo: expand ab file to multi hierarchy
             static void CopyABAndGenerateXml(List<string> changeList, string hotCount)
             {
-                if (!Directory.Exists(m_HotPath))
+                string curPath = m_HotPath + "/" + PlayerSettings.bundleVersion + "/" + hotCount;
+                if (!Directory.Exists(curPath))
                 {
-                    Directory.CreateDirectory(m_HotPath);
+                    Directory.CreateDirectory(curPath);
                 }
-
-                DeleteAllFile(m_HotPath);
+                DeleteAllFile(curPath);
                 foreach (var str in changeList)
                 {
                     if (!str.EndsWith(".manifest"))
                     {
-                        File.Copy(m_BundleTargetPath+"/"+str,m_HotPath+"/"+str);
+                        File.Copy(m_BundleTargetPath+"/"+str,curPath+"/"+str);
                     }
                 }
-                
                 //server produce patch
                 DirectoryInfo directoryInfo = new DirectoryInfo(m_HotPath);
                 FileInfo[] files = directoryInfo.GetFiles("*", SearchOption.AllDirectories);
@@ -392,12 +453,17 @@
                     patch.Name = files[i].Name;
                     patch.Size = files[i].Length / 1024.0f;
                     patch.Platform = EditorUserBuildSettings.activeBuildTarget.ToString();
-                    patch.Url = "http://127.0.0.1/AssetBundle/" + PlayerSettings.bundleVersion + "/" + hotCount + "/" +
-                                files[i].Name;
+                    patch.Url = HotPatchManager.Instance.ServerAddress + "/"+m_FilePrefix+"/" + PlayerSettings.bundleVersion + "/" + hotCount
+                    +"/"+files[i].Name;
                     patches.Files.Add(patch);
                 }
+                BinarySerializeOpt.XmlSerialize(curPath + "/Patch.xml", patches);
+                ServerInfo serverInfo =
+                    BinarySerializeOpt.XmlDeserialize( Application.dataPath+"/../Hot" + "/ServerInfo.xml", typeof(ServerInfo)) as ServerInfo;
+                serverInfo.GameVersion.Last().Patches[0] = patches;
+                BinarySerializeOpt.XmlSerialize( Application.dataPath+"/../Hot" + "/ServerInfo.xml",serverInfo);
 
-                BinarySerializeOpt.Xmlserialize(m_HotPath + "/Patch.xml", patches);
+
             }
             
         }

@@ -51,6 +51,7 @@ namespace MyRealFrame
         }
 
         //清除对象池
+        //一般用于切换场景时使用，同时搭配Resource.ClearCahe
         public void ClearCache()
         {
             List<uint> tempList = new List<uint>();

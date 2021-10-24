@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Xml.Serialization;
-using UnityEditor.PackageManager;
+using UnityEngine.Serialization;
+
 
 namespace MyRealFrame
 {
@@ -16,7 +17,7 @@ namespace MyRealFrame
     public class VersionInfo
     {
         [XmlAttribute] public string Version;
-        [XmlElement] public Patches[] patches;
+        [FormerlySerializedAs("patches")] [XmlElement] public Patches[] Patches;
     }
 
     [Serializable]

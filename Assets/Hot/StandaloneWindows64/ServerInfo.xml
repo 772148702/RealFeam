@@ -1,0 +1,8 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ServerInfo>
+  <GameVersion Version="0.1">
+    <Patches xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" Version="1">
+      <Files Name="Patch.xml.meta" Url="http://127.0.0.1:8000/AssetBundle/0.1/1/Patch.xml.meta" Platform="StandaloneWindows64" Md5="b729525fb9e59ecc429a6e29a4b522f9" Size="0.154296875" />
+    </Patches>
+  </GameVersion>
+</ServerInfo>
